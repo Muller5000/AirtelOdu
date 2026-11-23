@@ -18,6 +18,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Dialpad
+import androidx.compose.material.icons.rounded.Refresh
+import androidx.compose.material.icons.rounded.Sms
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -30,6 +35,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.airteldatamonitor.data.model.RouterSmsMessage
@@ -65,22 +71,25 @@ fun SmsCenterScreen(
                             text = "Router SMS & USSD",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                         Text(
                             text = "Airtel SIM Card Inbox & Service Codes",
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Text(
-                            text = "←",
-                            fontSize = 22.sp,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontWeight = FontWeight.Bold
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                            contentDescription = "Back",
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 },
@@ -89,11 +98,10 @@ fun SmsCenterScreen(
                         onClick = { viewModel.loadMessages() },
                         enabled = !isRefreshing
                     ) {
-                        Text(
-                            text = "↻",
-                            fontSize = 22.sp,
-                            color = StatusInfo,
-                            fontWeight = FontWeight.Bold
+                        Icon(
+                            imageVector = Icons.Rounded.Refresh,
+                            contentDescription = "Refresh SMS",
+                            tint = StatusInfo
                         )
                     }
                 },
@@ -123,10 +131,19 @@ fun SmsCenterScreen(
                     onClick = { activeTab = 0 },
                     text = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Rounded.Sms,
+                                contentDescription = null,
+                                tint = if (activeTab == 0) AirtelRed else MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
                             Text(
-                                text = "📩 SMS Messages",
+                                text = "SMS Messages",
                                 fontWeight = if (activeTab == 0) FontWeight.Bold else FontWeight.Normal,
-                                color = if (activeTab == 0) AirtelRed else MaterialTheme.colorScheme.onSurfaceVariant
+                                color = if (activeTab == 0) AirtelRed else MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                             val unread = (uiState as? UiState.Success)?.data?.unreadCount ?: 0
                             if (unread > 0) {
@@ -151,11 +168,22 @@ fun SmsCenterScreen(
                     selected = activeTab == 1,
                     onClick = { activeTab = 1 },
                     text = {
-                        Text(
-                            text = "⚡ USSD Services",
-                            fontWeight = if (activeTab == 1) FontWeight.Bold else FontWeight.Normal,
-                            color = if (activeTab == 1) AirtelRed else MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Rounded.Dialpad,
+                                contentDescription = null,
+                                tint = if (activeTab == 1) AirtelRed else MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "USSD Services",
+                                fontWeight = if (activeTab == 1) FontWeight.Bold else FontWeight.Normal,
+                                color = if (activeTab == 1) AirtelRed else MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     }
                 )
             }

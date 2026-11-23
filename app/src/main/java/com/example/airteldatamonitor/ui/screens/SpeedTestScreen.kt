@@ -21,9 +21,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.Speed
+import androidx.compose.material.icons.rounded.Stop
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,6 +45,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.airteldatamonitor.data.speedtest.SpeedTestStage
@@ -76,11 +83,11 @@ fun SpeedTestScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             item {
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
                 SpeedTestHeader()
             }
 
@@ -91,6 +98,62 @@ fun SpeedTestScreen(
                     stage = state.stage,
                     progress = state.progress
                 )
+            }
+
+            // Primary Action Button placed immediately below the gauge for above-the-fold reach
+            item {
+                if (isRunning) {
+                    Button(
+                        onClick = { viewModel.cancelSpeedTest() },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = StatusError.copy(alpha = 0.15f),
+                            contentColor = StatusError
+                        ),
+                        shape = RoundedCornerShape(16.dp),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, StatusError)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Stop,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "STOP SPEED TEST",
+                            fontSize = 14.5.sp,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 0.5.sp
+                        )
+                    }
+                } else {
+                    Button(
+                        onClick = { viewModel.startSpeedTest() },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = AirtelRed,
+                            contentColor = Color.White
+                        ),
+                        shape = RoundedCornerShape(16.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.PlayArrow,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = if (state.stage == SpeedTestStage.COMPLETED) "RUN SPEED TEST AGAIN" else "START LIVE SPEED TEST",
+                            fontSize = 14.5.sp,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 0.5.sp
+                        )
+                    }
+                }
             }
 
             // Realtime Sparkline (during active tests)
@@ -170,49 +233,7 @@ fun SpeedTestScreen(
                 }
             }
 
-            // Action Button
             item {
-                Spacer(modifier = Modifier.height(4.dp))
-                if (isRunning) {
-                    Button(
-                        onClick = { viewModel.cancelSpeedTest() },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(52.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = StatusError.copy(alpha = 0.15f),
-                            contentColor = StatusError
-                        ),
-                        shape = RoundedCornerShape(16.dp),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, StatusError)
-                    ) {
-                        Text(
-                            text = "STOP SPEED TEST",
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = 0.5.sp
-                        )
-                    }
-                } else {
-                    Button(
-                        onClick = { viewModel.startSpeedTest() },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(52.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = AirtelRed,
-                            contentColor = Color.White
-                        ),
-                        shape = RoundedCornerShape(16.dp)
-                    ) {
-                        Text(
-                            text = if (state.stage == SpeedTestStage.COMPLETED) "RUN SPEED TEST AGAIN" else "START LIVE SPEED TEST",
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = 0.5.sp
-                        )
-                    }
-                }
                 Spacer(modifier = Modifier.height(16.dp))
             }
         }
@@ -226,18 +247,22 @@ fun SpeedTestHeader() {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column {
+        Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
             Text(
                 text = "Live Speed Test",
                 color = MaterialTheme.colorScheme.onSurface,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold
+                fontSize = 21.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
-                text = "Real-time Bandwidth & Latency Benchmark",
+                text = "Bandwidth & latency benchmark",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 13.sp
+                fontSize = 12.5.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         }
 
@@ -248,12 +273,21 @@ fun SpeedTestHeader() {
                 .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
                 .padding(horizontal = 10.dp, vertical = 6.dp)
         ) {
-            Text(
-                text = "⚡ SPEED",
-                color = AirtelRed,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Rounded.Speed,
+                    contentDescription = null,
+                    tint = AirtelRed,
+                    modifier = Modifier.size(14.dp)
+                )
+                Spacer(modifier = Modifier.width(5.dp))
+                Text(
+                    text = "LIVE",
+                    color = AirtelRed,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
     }
 }
@@ -285,7 +319,7 @@ fun SpeedometerGauge(
             .clip(RoundedCornerShape(20.dp))
             .background(MaterialTheme.colorScheme.surface)
             .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(20.dp))
-            .padding(vertical = 24.dp, horizontal = 16.dp),
+            .padding(vertical = 14.dp, horizontal = 16.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -293,10 +327,10 @@ fun SpeedometerGauge(
         ) {
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier.size(240.dp)
+                modifier = Modifier.size(196.dp)
             ) {
-                Canvas(modifier = Modifier.size(230.dp)) {
-                    val strokeWidth = 14.dp.toPx()
+                Canvas(modifier = Modifier.size(188.dp)) {
+                    val strokeWidth = 12.dp.toPx()
                     val startAngle = 150f
                     val sweepMaxAngle = 240f
 
@@ -363,25 +397,27 @@ fun SpeedometerGauge(
 
                     Text(
                         text = speedDisplay,
+                        style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum"),
                         color = MaterialTheme.colorScheme.onSurface,
-                        fontSize = 44.sp,
-                        fontWeight = FontWeight.Bold
+                        fontSize = 38.sp,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1
                     )
 
                     Text(
                         text = "Mbps",
                         color = AirtelRed,
-                        fontSize = 13.sp,
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 1.sp
                     )
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
 
                     // Stage status badge
                     Box(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(12.dp))
+                            .clip(RoundedCornerShape(10.dp))
                             .background(
                                 if (stage == SpeedTestStage.IDLE || stage == SpeedTestStage.COMPLETED) {
                                     AirtelRed.copy(alpha = 0.12f)
@@ -396,9 +432,9 @@ fun SpeedometerGauge(
                                 } else {
                                     MaterialTheme.colorScheme.outline
                                 },
-                                RoundedCornerShape(12.dp)
+                                RoundedCornerShape(10.dp)
                             )
-                            .padding(horizontal = 12.dp, vertical = 4.dp)
+                            .padding(horizontal = 10.dp, vertical = 3.dp)
                     ) {
                         Text(
                             text = stage.label,
@@ -407,8 +443,9 @@ fun SpeedometerGauge(
                             } else {
                                 MaterialTheme.colorScheme.onSurface
                             },
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.SemiBold
+                            fontSize = 10.5.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            maxLines = 1
                         )
                     }
                 }
@@ -494,7 +531,9 @@ fun SpeedMetricCard(
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 0.5.sp,
-                    maxLines = 1
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f).padding(end = 4.dp)
                 )
                 if (isActive) {
                     Box(
@@ -511,10 +550,12 @@ fun SpeedMetricCard(
             Row(verticalAlignment = Alignment.Bottom) {
                 Text(
                     text = value,
+                    style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum"),
                     color = tint,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
-                    maxLines = 1
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
@@ -522,7 +563,8 @@ fun SpeedMetricCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(bottom = 2.dp)
+                    modifier = Modifier.padding(bottom = 2.dp),
+                    maxLines = 1
                 )
             }
 
@@ -530,9 +572,11 @@ fun SpeedMetricCard(
 
             Text(
                 text = subtitle,
+                style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum"),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontSize = 11.sp,
-                maxLines = 1
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         }
     }
@@ -564,7 +608,8 @@ fun HardwareContextCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.8.sp
+                    letterSpacing = 0.8.sp,
+                    maxLines = 1
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
@@ -572,9 +617,12 @@ fun HardwareContextCard(
                     color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.SemiBold,
-                    maxLines = 1
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
+
+            Spacer(modifier = Modifier.width(8.dp))
 
             Box(
                 modifier = Modifier
@@ -585,9 +633,12 @@ fun HardwareContextCard(
             ) {
                 Text(
                     text = "$band • $rsrp",
+                    style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum"),
                     color = AirtelRed,
                     fontSize = 11.sp,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }

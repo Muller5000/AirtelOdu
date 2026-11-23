@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.airteldatamonitor.data.model.UiState
@@ -163,18 +164,22 @@ fun UsageHeader(isLive: Boolean) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column {
+        Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
             Text(
                 text = "Usage Analytics",
                 color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
             Spacer(modifier = Modifier.height(1.dp))
             Text(
                 text = if (isLive) "ZLT W154R+ • Current Cycle WAN Counters" else "Modeled Router Traffic Trends",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 11.5.sp
+                fontSize = 11.5.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         }
 
@@ -225,7 +230,7 @@ fun PeriodSelectorTabs(
                         if (isSelected) AirtelRed.copy(alpha = 0.5f) else Color.Transparent,
                         RoundedCornerShape(14.dp)
                     )
-                    .tactileClickable(scaleDown = 0.94f) { onSelect(period) }
+                    .tactileClickable(scaleDown = 0.96f) { onSelect(period) }
                     .padding(vertical = 9.dp),
                 contentAlignment = Alignment.Center
             ) {
@@ -237,7 +242,9 @@ fun PeriodSelectorTabs(
                     },
                     color = if (isSelected) AirtelRed else textSecondary,
                     fontSize = 12.sp,
-                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }

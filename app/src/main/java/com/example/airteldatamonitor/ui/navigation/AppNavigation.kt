@@ -36,6 +36,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.airteldatamonitor.data.repository.RouterRepository
@@ -191,11 +192,11 @@ fun BottomNavBar(
             .clip(RoundedCornerShape(24.dp))
             .background(navSurface)
             .border(1.dp, navOutline, RoundedCornerShape(24.dp))
-            .padding(horizontal = 6.dp, vertical = 5.dp)
+            .padding(6.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround,
+            horizontalArrangement = Arrangement.spacedBy(2.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             AppDestination.entries.forEach { destination ->
@@ -205,10 +206,11 @@ fun BottomNavBar(
 
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(16.dp))
+                        .weight(1f)
+                        .clip(RoundedCornerShape(18.dp))
                         .background(if (isSelected) AirtelRedMuted else Color.Transparent)
-                        .tactileClickable(scaleDown = 0.94f) { onSelectDestination(destination) }
-                        .padding(horizontal = 10.dp, vertical = 5.dp),
+                        .tactileClickable(scaleDown = 0.96f) { onSelectDestination(destination) }
+                        .padding(horizontal = 2.dp, vertical = 6.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(
@@ -227,7 +229,8 @@ fun BottomNavBar(
                             fontSize = 10.sp,
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                             maxLines = 1,
-                            softWrap = false
+                            softWrap = false,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }

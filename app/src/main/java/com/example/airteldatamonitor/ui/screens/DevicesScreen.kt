@@ -22,12 +22,21 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Block
 import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.Computer
+import androidx.compose.material.icons.rounded.DevicesOther
 import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.LaptopMac
+import androidx.compose.material.icons.rounded.Smartphone
+import androidx.compose.material.icons.rounded.Speaker
+import androidx.compose.material.icons.rounded.SportsEsports
+import androidx.compose.material.icons.rounded.TabletMac
+import androidx.compose.material.icons.rounded.Tv
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -44,6 +53,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.airteldatamonitor.data.model.ConnectedDevice
@@ -412,18 +422,22 @@ fun DevicesHeader(isLive: Boolean) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column {
+        Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
             Text(
                 text = "Connected Devices",
                 color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
             Spacer(modifier = Modifier.height(1.dp))
             Text(
                 text = if (isLive) "ZLT W154R+ • Wi-Fi & LAN Clients" else "Simulated Device Network",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 11.5.sp
+                fontSize = 11.5.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         }
 
@@ -459,7 +473,7 @@ fun DevicesHeader(isLive: Boolean) {
 
 /**
  * Editorial Compact DeviceCard.
- * Clean, readable, and removes repetitive 3-column N/A* clutter.
+ * Clean, readable, and uses crisp Material vector icons with 38dp hit targets.
  */
 @Composable
 fun DeviceCard(
@@ -469,14 +483,14 @@ fun DeviceCard(
     onBlockToggleClick: (ConnectedDevice) -> Unit = {}
 ) {
     val categoryIcon = when (device.category) {
-        DeviceCategory.SMARTPHONE -> "📱"
-        DeviceCategory.LAPTOP -> "💻"
-        DeviceCategory.SMART_TV -> "📺"
-        DeviceCategory.GAMING_CONSOLE -> "🎮"
-        DeviceCategory.TABLET -> "📱"
-        DeviceCategory.SMART_SPEAKER -> "🔊"
-        DeviceCategory.IOT_DEVICE -> "💡"
-        DeviceCategory.WORKSTATION -> "🖥"
+        DeviceCategory.SMARTPHONE -> Icons.Rounded.Smartphone
+        DeviceCategory.LAPTOP -> Icons.Rounded.LaptopMac
+        DeviceCategory.SMART_TV -> Icons.Rounded.Tv
+        DeviceCategory.GAMING_CONSOLE -> Icons.Rounded.SportsEsports
+        DeviceCategory.TABLET -> Icons.Rounded.TabletMac
+        DeviceCategory.SMART_SPEAKER -> Icons.Rounded.Speaker
+        DeviceCategory.IOT_DEVICE -> Icons.Rounded.DevicesOther
+        DeviceCategory.WORKSTATION -> Icons.Rounded.Computer
     }
 
     val cardBg = MaterialTheme.colorScheme.surface
@@ -508,9 +522,11 @@ fun DeviceCard(
                     .background(if (device.isBlocked) StatusError.copy(alpha = 0.12f) else MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = if (device.isBlocked) "🚫" else categoryIcon,
-                    fontSize = 18.sp
+                Icon(
+                    imageVector = if (device.isBlocked) Icons.Rounded.Block else categoryIcon,
+                    contentDescription = if (device.isBlocked) "Blocked Device" else device.category.name,
+                    tint = if (device.isBlocked) StatusError else textSecondary,
+                    modifier = Modifier.size(20.dp)
                 )
             }
 
@@ -524,7 +540,9 @@ fun DeviceCard(
                         color = if (device.isBlocked) StatusError else textPrimary,
                         fontSize = 14.5.sp,
                         fontWeight = FontWeight.SemiBold,
-                        maxLines = 1
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false)
                     )
                     if (device.isBlocked) {
                         Spacer(modifier = Modifier.width(6.dp))
@@ -543,9 +561,11 @@ fun DeviceCard(
 
                 Text(
                     text = "${device.ipAddress} • ${device.connectionType.label}",
+                    style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum"),
                     color = textSecondary,
                     fontSize = 11.5.sp,
-                    maxLines = 1
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
 
                 if (device.customNickname != null) {
@@ -554,14 +574,15 @@ fun DeviceCard(
                         color = textSecondary.copy(alpha = 0.7f),
                         fontSize = 10.sp,
                         fontFamily = FontFamily.Monospace,
-                        maxLines = 1
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            // Action Buttons
+            // Action Buttons (38dp for comfortable touch targets)
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
@@ -569,32 +590,32 @@ fun DeviceCard(
                 // Rename Button
                 Box(
                     modifier = Modifier
-                        .size(32.dp)
-                        .clip(RoundedCornerShape(8.dp))
+                        .size(38.dp)
+                        .clip(RoundedCornerShape(10.dp))
                         .background(MaterialTheme.colorScheme.surfaceVariant)
-                        .tactileClickable(scaleDown = 0.92f) { onRenameClick(device) },
+                        .tactileClickable(scaleDown = 0.96f) { onRenameClick(device) },
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.Edit,
                         contentDescription = "Rename",
                         tint = textSecondary,
-                        modifier = Modifier.size(15.dp)
+                        modifier = Modifier.size(17.dp)
                     )
                 }
 
                 // Block/Allow Button
                 Box(
                     modifier = Modifier
-                        .size(32.dp)
-                        .clip(RoundedCornerShape(8.dp))
+                        .size(38.dp)
+                        .clip(RoundedCornerShape(10.dp))
                         .background(if (device.isBlocked) StatusOnline.copy(alpha = 0.12f) else StatusError.copy(alpha = 0.12f))
-                        .tactileClickable(scaleDown = 0.92f, enabled = !isOperating) { onBlockToggleClick(device) },
+                        .tactileClickable(scaleDown = 0.96f, enabled = !isOperating) { onBlockToggleClick(device) },
                     contentAlignment = Alignment.Center
                 ) {
                     if (isOperating) {
                         CircularProgressIndicator(
-                            modifier = Modifier.size(12.dp),
+                            modifier = Modifier.size(14.dp),
                             color = if (device.isBlocked) StatusOnline else StatusError,
                             strokeWidth = 1.5.dp
                         )
@@ -603,7 +624,7 @@ fun DeviceCard(
                             imageVector = if (device.isBlocked) Icons.Rounded.CheckCircle else Icons.Rounded.Block,
                             contentDescription = if (device.isBlocked) "Unblock" else "Block",
                             tint = if (device.isBlocked) StatusOnline else StatusError,
-                            modifier = Modifier.size(15.dp)
+                            modifier = Modifier.size(17.dp)
                         )
                     }
                 }

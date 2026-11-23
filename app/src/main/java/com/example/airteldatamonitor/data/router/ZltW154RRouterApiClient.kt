@@ -276,11 +276,14 @@ class ZltW154RRouterApiClient(
                     }
                 }
 
-                val hostname = entry.optString("hostname").ifEmpty {
-                    wifiEntry?.optString("user").orEmpty().ifEmpty {
-                        "Connected Device"
-                    }
-                }.let { if (it == "--") "Connected Device" else it }
+                val rawHostname = entry.optString("hostname").trim().ifEmpty {
+                    wifiEntry?.optString("user").orEmpty().trim()
+                }
+                val hostname = if (rawHostname.isBlank() || rawHostname == "--" || rawHostname == "*") {
+                    "Wi-Fi Client"
+                } else {
+                    rawHostname
+                }
 
                 val ip = entry.optString("ip", "Unknown IP")
                 val rssi = wifiEntry?.optInt("rssi")
@@ -1136,9 +1139,16 @@ class ZltW154RRouterApiClient(
         val lower = hostname.lowercase(Locale.ROOT)
         return when {
             lower.contains("iphone") || lower.contains("android") || lower.contains("pixel") ||
-                lower.contains("galaxy") || lower.contains("redmi") || lower.contains("phone") -> DeviceCategory.SMARTPHONE
+                lower.contains("galaxy") || lower.contains("redmi") || lower.contains("phone") ||
+                lower.contains("xiaomi") || lower.contains("realme") || lower.contains("poco") ||
+                lower.contains("oneplus") || lower.contains("oppo") || lower.contains("vivo") ||
+                lower.contains("tecno") || lower.contains("infinix") || lower.contains("itel") ||
+                lower.contains("huawei") || lower.contains("honor") || lower.contains("motorola") ||
+                lower.contains("moto") || lower.contains("nokia") || lower.contains("samsung") -> DeviceCategory.SMARTPHONE
             lower.contains("macbook") || lower.contains("laptop") || lower.contains("thinkpad") ||
-                lower.contains("dell") || lower.contains("hp") -> DeviceCategory.LAPTOP
+                lower.contains("dell") || lower.contains("hp") || lower.contains("windows") ||
+                lower.contains("surface") || lower.contains("asus") || lower.contains("lenovo") ||
+                lower.contains("acer") || lower.contains("msi") || lower.contains("mac") -> DeviceCategory.LAPTOP
             lower.contains("tv") || lower.contains("roku") || lower.contains("firestick") ||
                 lower.contains("chromecast") -> DeviceCategory.SMART_TV
             lower.contains("ps5") || lower.contains("playstation") || lower.contains("xbox") ||

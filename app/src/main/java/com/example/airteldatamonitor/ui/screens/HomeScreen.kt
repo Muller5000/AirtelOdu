@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -24,9 +25,20 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
+import androidx.compose.material.icons.rounded.ArrowDownward
+import androidx.compose.material.icons.rounded.ArrowUpward
+import androidx.compose.material.icons.rounded.Bolt
+import androidx.compose.material.icons.rounded.CellTower
+import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.SettingsInputAntenna
+import androidx.compose.material.icons.rounded.Sms
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -45,8 +57,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.airteldatamonitor.data.model.DataUsage
@@ -231,21 +245,21 @@ fun UnifiedHeroCard(
             .padding(18.dp)
     ) {
         Column {
-            // Row 1: Brand & Gateway info (Left) + Signal Status Pill & Edit Button (Right)
+            // Row 1: Brand & Gateway info (Left) + Clean Edit Plan Button (Right)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(
-                    modifier = Modifier.weight(1f, fill = false).padding(end = 8.dp),
+                    modifier = Modifier.weight(1f).padding(end = 10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(7.dp))
+                            .clip(RoundedCornerShape(8.dp))
                             .background(AirtelRed)
-                            .padding(horizontal = 7.dp, vertical = 4.dp),
+                            .padding(horizontal = 8.dp, vertical = 4.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
@@ -258,106 +272,124 @@ fun UnifiedHeroCard(
                         )
                     }
 
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(10.dp))
 
-                    Column {
+                    Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = dataUsage.planName,
                             color = MaterialTheme.colorScheme.onSurface,
-                            fontSize = 14.sp,
+                            fontSize = 14.5.sp,
                             fontWeight = FontWeight.SemiBold,
-                            maxLines = 1
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                         Text(
                             text = if (isLive) "ZLT W154R+ • 4G LTE" else "Simulated Gateway",
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontSize = 10.5.sp,
-                            maxLines = 1
+                            fontSize = 11.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    // Signal / Mode Pill
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(if (isLive) StatusOnlineMuted else AirtelRedMuted)
-                            .border(
-                                1.dp,
-                                if (isLive) StatusOnline.copy(alpha = 0.4f) else AirtelRed.copy(alpha = 0.4f),
-                                RoundedCornerShape(10.dp)
-                            )
-                            .tactileClickable(scaleDown = 0.94f, onClick = onNavigateToAntennaAlignment)
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Box(
-                                modifier = Modifier
-                                    .size(5.dp)
-                                    .clip(CircleShape)
-                                    .background(if (isLive) StatusOnline else AirtelRed)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = if (isLive) signalSnippet else "DEMO",
-                                color = if (isLive) StatusOnline else AirtelRed,
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                maxLines = 1
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.width(6.dp))
-
-                    // Edit Plan Button (Emil Kowalski tactile press)
-                    Box(
-                        modifier = Modifier
-                            .size(28.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(MaterialTheme.colorScheme.surfaceVariant)
-                            .tactileClickable(scaleDown = 0.92f, onClick = onEditPlan),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "✏️",
-                            fontSize = 12.sp
-                        )
-                    }
+                // Edit Plan Button (Emil Kowalski tactile press)
+                Box(
+                    modifier = Modifier
+                        .size(36.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .tactileClickable(scaleDown = 0.96f, onClick = onEditPlan),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Edit,
+                        contentDescription = "Edit Data Plan",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(16.dp)
+                    )
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Row 2: Hero Tabular Metric & Days Left
+            // Row 2 Header: DATA REMAINING label (Left) + Clickable Signal / Mode Pill (Right)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "DATA REMAINING",
+                    style = DataTypography.labelCaps,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 10.sp
+                )
+
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(if (isLive) StatusOnlineMuted else AirtelRedMuted)
+                        .border(
+                            1.dp,
+                            if (isLive) StatusOnline.copy(alpha = 0.4f) else AirtelRed.copy(alpha = 0.4f),
+                            RoundedCornerShape(10.dp)
+                        )
+                        .tactileClickable(scaleDown = 0.96f, onClick = onNavigateToAntennaAlignment)
+                        .padding(start = 8.dp, end = 4.dp, top = 4.dp, bottom = 4.dp)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier
+                                .size(5.dp)
+                                .clip(CircleShape)
+                                .background(if (isLive) StatusOnline else AirtelRed)
+                        )
+                        Spacer(modifier = Modifier.width(5.dp))
+                        Text(
+                            text = if (isLive) signalSnippet else "DEMO",
+                            color = if (isLive) StatusOnline else AirtelRed,
+                            style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum"),
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Spacer(modifier = Modifier.width(2.dp))
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowRight,
+                            contentDescription = "Open Antenna Alignment",
+                            tint = if (isLive) StatusOnline else AirtelRed,
+                            modifier = Modifier.size(13.dp)
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // Row 2 Value: Hero Tabular Metric & Days Left
             Row(
                 verticalAlignment = Alignment.Bottom,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Column(modifier = Modifier.weight(1f)) {
+                Row(
+                    verticalAlignment = Alignment.Bottom,
+                    modifier = Modifier.weight(1f)
+                ) {
                     Text(
-                        text = "DATA REMAINING",
-                        style = DataTypography.labelCaps,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 10.sp
+                        text = String.format(Locale.US, "%.1f", dataUsage.remainingGb),
+                        style = DataTypography.heroMetric,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Row(verticalAlignment = Alignment.Bottom) {
-                        Text(
-                            text = String.format(Locale.US, "%.1f", dataUsage.remainingGb),
-                            style = DataTypography.heroMetric,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Spacer(modifier = Modifier.width(5.dp))
-                        Text(
-                            text = "GB",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Medium,
-                            modifier = Modifier.padding(bottom = 5.dp)
-                        )
-                    }
+                    Spacer(modifier = Modifier.width(5.dp))
+                    Text(
+                        text = "GB",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(bottom = 5.dp)
+                    )
                 }
 
                 Column(horizontalAlignment = Alignment.End) {
@@ -370,17 +402,20 @@ fun UnifiedHeroCard(
                     ) {
                         Text(
                             text = "${dataUsage.daysRemainingInCycle} days left",
+                            style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum"),
                             color = MaterialTheme.colorScheme.onSurface,
                             fontSize = 11.sp,
-                            fontWeight = FontWeight.SemiBold
+                            fontWeight = FontWeight.SemiBold,
+                            maxLines = 1
                         )
                     }
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = String.format(Locale.US, "%.1f%% used", dataUsage.usagePercentage),
-                        style = DataTypography.labelCaps,
+                        style = DataTypography.labelCaps.copy(fontFeatureSettings = "tnum"),
                         color = AirtelRed,
-                        fontSize = 10.sp
+                        fontSize = 10.sp,
+                        maxLines = 1
                     )
                 }
             }
@@ -418,13 +453,19 @@ fun UnifiedHeroCard(
             ) {
                 Text(
                     text = String.format(Locale.US, "Used: %.1f of %.0f GB", dataUsage.usedGb, dataUsage.totalPlanGb),
+                    style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum"),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 11.5.sp
+                    fontSize = 11.5.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f).padding(end = 8.dp)
                 )
                 Text(
                     text = String.format(Locale.US, "Avg: %.1f GB/d", dataUsage.dailyAverageGb),
+                    style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum"),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 11.5.sp
+                    fontSize = 11.5.sp,
+                    maxLines = 1
                 )
             }
         }
@@ -450,29 +491,37 @@ fun LiveTelemetryStrip(
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Downstream
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "↓",
-                    color = StatusOnline,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.ArrowDownward,
+                    contentDescription = "Download",
+                    tint = StatusOnline,
+                    modifier = Modifier.size(16.dp)
                 )
-                Spacer(modifier = Modifier.width(5.dp))
-                Column {
+                Spacer(modifier = Modifier.width(6.dp))
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = String.format(Locale.US, "%.1f Mbps", throughput.downloadSpeedMbps),
+                        style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum"),
                         color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 12.5.sp,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Text(
-                        text = "Peak ${throughput.peakDownloadTodayMbps.toInt()}",
+                        text = "Peak ${throughput.peakDownloadTodayMbps.toInt()}M",
+                        style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum"),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 9.5.sp
+                        fontSize = 10.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }
@@ -480,31 +529,40 @@ fun LiveTelemetryStrip(
             // Divider
             Box(
                 modifier = Modifier
+                    .padding(horizontal = 6.dp)
                     .width(1.dp)
-                    .height(24.dp)
+                    .height(28.dp)
                     .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
             )
 
             // Upstream
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "↑",
-                    color = StatusInfo,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.ArrowUpward,
+                    contentDescription = "Upload",
+                    tint = StatusInfo,
+                    modifier = Modifier.size(16.dp)
                 )
-                Spacer(modifier = Modifier.width(5.dp))
-                Column {
+                Spacer(modifier = Modifier.width(6.dp))
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = String.format(Locale.US, "%.1f Mbps", throughput.uploadSpeedMbps),
+                        style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum"),
                         color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 12.5.sp,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Text(
                         text = "Upload",
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 9.5.sp
+                        fontSize = 10.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }
@@ -512,29 +570,41 @@ fun LiveTelemetryStrip(
             // Divider
             Box(
                 modifier = Modifier
+                    .padding(horizontal = 6.dp)
                     .width(1.dp)
-                    .height(24.dp)
+                    .height(28.dp)
                     .background(MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
             )
 
             // Ping & Uptime
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "⚡",
-                    fontSize = 12.sp
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.Bolt,
+                    contentDescription = "Latency",
+                    tint = Color(0xFFF59E0B),
+                    modifier = Modifier.size(16.dp)
                 )
                 Spacer(modifier = Modifier.width(5.dp))
-                Column {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "${throughput.pingMs} ms",
+                        style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum"),
                         color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 12.5.sp,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Text(
                         text = "Up $uptimeFormatted",
+                        style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum"),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 9.5.sp
+                        fontSize = 10.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }
@@ -557,7 +627,7 @@ fun AntennaAlignmentCard(
             .clip(RoundedCornerShape(18.dp))
             .background(MaterialTheme.colorScheme.surface)
             .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(18.dp))
-            .tactileClickable(scaleDown = 0.97f, onClick = onClick)
+            .tactileClickable(scaleDown = 0.96f, onClick = onClick)
             .padding(horizontal = 14.dp, vertical = 12.dp)
     ) {
         Row(
@@ -571,48 +641,37 @@ fun AntennaAlignmentCard(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(38.dp)
-                        .clip(RoundedCornerShape(11.dp))
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(10.dp))
                         .background(AirtelRedMuted),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = "🎯",
-                        fontSize = 17.sp
+                    Icon(
+                        imageVector = Icons.Rounded.SettingsInputAntenna,
+                        contentDescription = "Outdoor Antenna Alignment",
+                        tint = AirtelRed,
+                        modifier = Modifier.size(20.dp)
                     )
                 }
 
                 Spacer(modifier = Modifier.width(12.dp))
 
-                Column {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = "Outdoor Antenna Alignment",
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontSize = 13.5.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(6.dp))
-                                .background(StatusOnlineMuted)
-                                .padding(horizontal = 5.dp, vertical = 2.dp)
-                        ) {
-                            Text(
-                                text = "ROOFTOP AUDIO",
-                                color = StatusOnline,
-                                fontSize = 8.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Outdoor Antenna Alignment",
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontSize = 13.5.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = "Aim your ODU mast with live RF gauges & audio beeps",
+                        text = "Live RF gauges • Rooftop audio tones",
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 11.sp,
-                        maxLines = 1
+                        fontSize = 11.5.sp,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }
@@ -621,16 +680,16 @@ fun AntennaAlignmentCard(
 
             Box(
                 modifier = Modifier
-                    .size(28.dp)
-                    .clip(RoundedCornerShape(8.dp))
+                    .size(32.dp)
+                    .clip(RoundedCornerShape(9.dp))
                     .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "→",
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold
+                Icon(
+                    imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.size(18.dp)
                 )
             }
         }
@@ -648,34 +707,36 @@ fun QuickActionTiles(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min),
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         QuickTile(
-            icon = "📩",
+            icon = Icons.Rounded.Sms,
             iconTint = Color(0xFFF59E0B),
             title = "SIM & SMS",
             value = "SMS Center",
             subtitle = "Airtime, OTP & 141",
             onClick = onNavigateToSmsCenter,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f).fillMaxHeight()
         )
 
         QuickTile(
-            icon = "📶",
+            icon = Icons.Rounded.CellTower,
             iconTint = StatusOnline,
             title = "Band Lock",
             value = "Carrier Bands",
-            subtitle = "LTE B1, B3, B7, B20",
+            subtitle = "LTE B1/B3/B7/B20",
             onClick = onNavigateToBandLock,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f).fillMaxHeight()
         )
     }
 }
 
 @Composable
 fun QuickTile(
-    icon: String,
+    icon: ImageVector,
     iconTint: Color,
     title: String,
     value: String,
@@ -699,22 +760,24 @@ fun QuickTile(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(30.dp)
-                        .clip(RoundedCornerShape(9.dp))
+                        .size(32.dp)
+                        .clip(RoundedCornerShape(10.dp))
                         .background(iconTint.copy(alpha = 0.12f)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = icon,
-                        fontSize = 14.sp
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = title,
+                        tint = iconTint,
+                        modifier = Modifier.size(17.dp)
                     )
                 }
 
-                Text(
-                    text = "→",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold
+                Icon(
+                    imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                    modifier = Modifier.size(18.dp)
                 )
             }
 
@@ -724,7 +787,9 @@ fun QuickTile(
                 text = title.uppercase(),
                 style = DataTypography.labelCaps,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 9.sp
+                fontSize = 9.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
 
             Spacer(modifier = Modifier.height(2.dp))
@@ -734,7 +799,8 @@ fun QuickTile(
                 color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold,
-                maxLines = 1
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
 
             Spacer(modifier = Modifier.height(1.dp))
@@ -743,7 +809,8 @@ fun QuickTile(
                 text = subtitle,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontSize = 11.sp,
-                maxLines = 1
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         }
     }

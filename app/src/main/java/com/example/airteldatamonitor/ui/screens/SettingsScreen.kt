@@ -20,10 +20,15 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.DarkMode
+import androidx.compose.material.icons.rounded.LightMode
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -48,6 +53,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.airteldatamonitor.data.model.DemoSimulationMode
@@ -262,13 +268,18 @@ fun DataPlanAllowanceCard(
                         text = "Monthly Allowance",
                         color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 15.sp,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
                         text = "$planName • ${monthlyPlanGb.toInt()} GB Allowance",
+                        style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum"),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 12.sp
+                        fontSize = 12.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
 
@@ -281,9 +292,11 @@ fun DataPlanAllowanceCard(
                 ) {
                     Text(
                         text = "${monthlyPlanGb.toInt()} GB",
+                        style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum"),
                         color = AirtelRed,
                         fontSize = 12.5.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1
                     )
                 }
             }
@@ -310,16 +323,18 @@ fun DataPlanAllowanceCard(
                         modifier = Modifier
                             .clip(RoundedCornerShape(12.dp))
                             .background(if (isSelected) AirtelRed else MaterialTheme.colorScheme.surfaceVariant)
-                            .tactileClickable(scaleDown = 0.93f) {
+                            .tactileClickable(scaleDown = 0.96f) {
                                 onUpdatePlan(planName, gb.toDouble())
                             }
-                            .padding(horizontal = 11.dp, vertical = 6.dp)
+                            .padding(horizontal = 11.dp, vertical = 7.dp)
                     ) {
                         Text(
                             text = "$gb GB",
+                            style = LocalTextStyle.current.copy(fontFeatureSettings = "tnum"),
                             color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurface,
                             fontSize = 11.5.sp,
-                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                            maxLines = 1
                         )
                     }
                 }
@@ -330,14 +345,15 @@ fun DataPlanAllowanceCard(
                             .clip(RoundedCornerShape(12.dp))
                             .background(MaterialTheme.colorScheme.surfaceVariant)
                             .border(1.dp, AirtelRed.copy(alpha = 0.4f), RoundedCornerShape(12.dp))
-                            .tactileClickable(scaleDown = 0.93f) { showCustomDialog = true }
-                            .padding(horizontal = 11.dp, vertical = 6.dp)
+                            .tactileClickable(scaleDown = 0.96f) { showCustomDialog = true }
+                            .padding(horizontal = 11.dp, vertical = 7.dp)
                     ) {
                         Text(
                             text = "Custom...",
                             color = AirtelRed,
                             fontSize = 11.5.sp,
-                            fontWeight = FontWeight.SemiBold
+                            fontWeight = FontWeight.SemiBold,
+                            maxLines = 1
                         )
                     }
                 }
@@ -360,6 +376,7 @@ fun DataPlanAllowanceCard(
 
 /**
  * Polished Dual-Pill Appearance Card (Emil Kowalski micro-interaction).
+ * Stacked layout prevents description text from wrapping tightly beside the toggle on small phones.
  */
 @Composable
 fun AppearanceThemeCard(
@@ -374,70 +391,83 @@ fun AppearanceThemeCard(
             .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(18.dp))
             .padding(16.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f).padding(end = 12.dp)) {
-                Text(
-                    text = "App Theme",
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = if (isDarkMode) "Obsidian Dark Mode (OLED)" else "Editorial Light Mode (Clean Paper)",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 12.sp
-                )
-            }
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = "App Theme",
+                color = MaterialTheme.colorScheme.onSurface,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = if (isDarkMode) "Obsidian Dark Mode (OLED)" else "Editorial Light Mode (Clean Paper)",
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontSize = 12.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
 
-            // Dual pill segmented toggle
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Full-width balanced 2-segment toggle
             Row(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(20.dp))
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(14.dp))
                     .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .padding(3.dp),
+                    .padding(4.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(16.dp))
+                        .weight(1f)
+                        .clip(RoundedCornerShape(10.dp))
                         .background(if (isDarkMode) AirtelRed else Color.Transparent)
-                        .tactileClickable(scaleDown = 0.92f) { onToggleDarkMode(true) }
-                        .padding(horizontal = 10.dp, vertical = 6.dp),
+                        .tactileClickable(scaleDown = 0.96f) { onToggleDarkMode(true) }
+                        .padding(vertical = 8.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("🌙", fontSize = 12.sp)
-                        Spacer(modifier = Modifier.width(4.dp))
+                        Icon(
+                            imageVector = Icons.Rounded.DarkMode,
+                            contentDescription = "Dark Mode",
+                            tint = if (isDarkMode) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(15.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            "Dark",
+                            text = "Dark",
                             color = if (isDarkMode) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontSize = 11.5.sp,
-                            fontWeight = if (isDarkMode) FontWeight.Bold else FontWeight.Medium
+                            fontSize = 12.sp,
+                            fontWeight = if (isDarkMode) FontWeight.Bold else FontWeight.Medium,
+                            maxLines = 1
                         )
                     }
                 }
 
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(16.dp))
+                        .weight(1f)
+                        .clip(RoundedCornerShape(10.dp))
                         .background(if (!isDarkMode) AirtelRed else Color.Transparent)
-                        .tactileClickable(scaleDown = 0.92f) { onToggleDarkMode(false) }
-                        .padding(horizontal = 10.dp, vertical = 6.dp),
+                        .tactileClickable(scaleDown = 0.96f) { onToggleDarkMode(false) }
+                        .padding(vertical = 8.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("☀️", fontSize = 12.sp)
-                        Spacer(modifier = Modifier.width(4.dp))
+                        Icon(
+                            imageVector = Icons.Rounded.LightMode,
+                            contentDescription = "Light Mode",
+                            tint = if (!isDarkMode) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(15.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            "Light",
+                            text = "Light",
                             color = if (!isDarkMode) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontSize = 11.5.sp,
-                            fontWeight = if (!isDarkMode) FontWeight.Bold else FontWeight.Medium
+                            fontSize = 12.sp,
+                            fontWeight = if (!isDarkMode) FontWeight.Bold else FontWeight.Medium,
+                            maxLines = 1
                         )
                     }
                 }
