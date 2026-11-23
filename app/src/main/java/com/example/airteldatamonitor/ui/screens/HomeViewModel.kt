@@ -32,10 +32,17 @@ class HomeViewModel(
             val cachedUsage = repository.cachedUsage
             val cachedInfo = repository.cachedRouterInfo
             if (cachedUsage != null && cachedInfo != null) {
+                val currentSettings = repository.settings.value
+                val remaining = (currentSettings.monthlyPlanGb - cachedUsage.usedGb).coerceAtLeast(0.0)
+                val adaptedUsage = cachedUsage.copy(
+                    planName = currentSettings.planName,
+                    totalPlanGb = currentSettings.monthlyPlanGb,
+                    remainingGb = remaining
+                )
                 UiState.Success(
                     HomeUiData(
                         routerInfo = cachedInfo,
-                        dataUsage = cachedUsage,
+                        dataUsage = adaptedUsage,
                         throughput = Throughput(),
                         connectedDeviceCount = 0
                     )

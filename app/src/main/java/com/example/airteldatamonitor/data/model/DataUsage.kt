@@ -13,8 +13,12 @@ data class DataUsage(
     val isDemoData: Boolean = true
 ) {
     val usagePercentage: Float
-        get() = ((usedGb / totalPlanGb) * 100).toFloat().coerceIn(0f, 100f)
+        get() = if (totalPlanGb > 0.0 && usedGb.isFinite()) {
+            ((usedGb / totalPlanGb) * 100).toFloat().coerceIn(0f, 100f)
+        } else 0f
 
     val remainingPercentage: Float
-        get() = ((remainingGb / totalPlanGb) * 100).toFloat().coerceIn(0f, 100f)
+        get() = if (totalPlanGb > 0.0 && remainingGb.isFinite()) {
+            ((remainingGb / totalPlanGb) * 100).toFloat().coerceIn(0f, 100f)
+        } else 0f
 }

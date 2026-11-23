@@ -91,6 +91,7 @@ class SpeedTestEngine {
             )
 
         } catch (e: Exception) {
+            if (e is kotlinx.coroutines.CancellationException) throw e
             if (currentCoroutineContext().isActive) {
                 _testState.value = _testState.value.copy(
                     stage = SpeedTestStage.ERROR,

@@ -114,4 +114,26 @@ class AppPreferences(context: Context) {
             .putString("cached_uptime", info.uptimeFormatted)
             .apply()
     }
+
+    fun loadNicknames(): Map<String, String> {
+        val result = mutableMapOf<String, String>()
+        for ((key, value) in prefs.all) {
+            if (key.startsWith("nick_") && value is String) {
+                val mac = key.removePrefix("nick_")
+                result[mac] = value
+            }
+        }
+        return result
+    }
+
+    fun saveNickname(mac: String, nickname: String) {
+        val editor = prefs.edit()
+        val key = "nick_${mac.uppercase()}"
+        if (nickname.isBlank()) {
+            editor.remove(key)
+        } else {
+            editor.putString(key, nickname.trim())
+        }
+        editor.apply()
+    }
 }

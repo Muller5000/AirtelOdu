@@ -138,7 +138,9 @@ class RouterRepository(
         }
     }
 
-    private val customNicknames = mutableMapOf<String, String>()
+    private val customNicknames = mutableMapOf<String, String>().apply {
+        appPreferences?.loadNicknames()?.let { putAll(it) }
+    }
     private val knownMacAddresses = mutableSetOf<String>()
 
     fun setDeviceNickname(mac: String, nickname: String) {
@@ -148,6 +150,7 @@ class RouterRepository(
         } else {
             customNicknames[normMac] = nickname.trim()
         }
+        appPreferences?.saveNickname(normMac, nickname)
     }
 
     fun getDeviceNickname(mac: String): String? {

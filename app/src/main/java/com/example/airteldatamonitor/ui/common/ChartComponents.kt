@@ -241,9 +241,10 @@ fun CategoryBreakdownView(
             ) {
                 categories.forEachIndexed { index, cat ->
                     val color = palette[index % palette.size]
+                    val safeWeight = if (cat.percentage.isFinite() && cat.percentage > 0f) cat.percentage else 0.1f
                     Box(
                         modifier = Modifier
-                            .weight(cat.percentage.coerceAtLeast(0.1f))
+                            .weight(safeWeight)
                             .height(12.dp)
                             .background(color)
                     )
