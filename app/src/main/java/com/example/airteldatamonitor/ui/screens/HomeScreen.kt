@@ -72,6 +72,7 @@ fun HomeScreen(
     onNavigateToSpeedTest: () -> Unit = {},
     onNavigateToSmsCenter: () -> Unit = {},
     onNavigateToBandLock: () -> Unit = {},
+    onNavigateToAntennaAlignment: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -143,7 +144,8 @@ fun HomeScreen(
                             routerModel = data.routerInfo.modelName,
                             signalSnippet = signalSnippet,
                             isLive = isLive,
-                            onEditPlan = { showEditPlanDialog = true }
+                            onEditPlan = { showEditPlanDialog = true },
+                            onNavigateToAntennaAlignment = onNavigateToAntennaAlignment
                         )
                     }
 
@@ -155,7 +157,14 @@ fun HomeScreen(
                         )
                     }
 
-                    // 3. Router Quick Action Tiles (SMS Center & Band Lock)
+                    // 3. Outdoor Antenna Alignment Tool Launcher
+                    item {
+                        AntennaAlignmentCard(
+                            onClick = onNavigateToAntennaAlignment
+                        )
+                    }
+
+                    // 4. Router Quick Action Tiles (SMS Center & Band Lock)
                     item {
                         QuickActionTiles(
                             onNavigateToSmsCenter = onNavigateToSmsCenter,
@@ -200,6 +209,7 @@ fun UnifiedHeroCard(
     signalSnippet: String,
     isLive: Boolean,
     onEditPlan: () -> Unit,
+    onNavigateToAntennaAlignment: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val animatedProgress = remember { Animatable(0f) }
@@ -278,6 +288,7 @@ fun UnifiedHeroCard(
                                 if (isLive) StatusOnline.copy(alpha = 0.4f) else AirtelRed.copy(alpha = 0.4f),
                                 RoundedCornerShape(10.dp)
                             )
+                            .tactileClickable(scaleDown = 0.94f, onClick = onNavigateToAntennaAlignment)
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -532,6 +543,101 @@ fun LiveTelemetryStrip(
 }
 
 /**
+ * Antenna Alignment Quick Action Card:
+ * One-tap launcher for rooftop mast tuning with live RF metrics & audio feedback.
+ */
+@Composable
+fun AntennaAlignmentCard(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(18.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(18.dp))
+            .tactileClickable(scaleDown = 0.97f, onClick = onClick)
+            .padding(horizontal = 14.dp, vertical = 12.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(38.dp)
+                        .clip(RoundedCornerShape(11.dp))
+                        .background(AirtelRedMuted),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "🎯",
+                        fontSize = 17.sp
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                Column {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = "Outdoor Antenna Alignment",
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = 13.5.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(StatusOnlineMuted)
+                                .padding(horizontal = 5.dp, vertical = 2.dp)
+                        ) {
+                            Text(
+                                text = "ROOFTOP AUDIO",
+                                color = StatusOnline,
+                                fontSize = 8.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = "Aim your ODU mast with live RF gauges & audio beeps",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontSize = 11.sp,
+                        maxLines = 1
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Box(
+                modifier = Modifier
+                    .size(28.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "→",
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    }
+}
+
+/**
  * 2 Non-Redundant Quick Action Tiles (SIM & SMS Center + Carrier Band Lock).
  * Removed Devices and Speed Test to avoid duplicating the bottom navigation dock.
  */
@@ -734,8 +840,10 @@ fun EditPlanDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    val limit = limitInput.toDoubleOrNull() ?: 150.0
-                    onSave(planName, limit)
+                    val parsed = limitInput.toDoubleOrNull() ?: 150.0
+                    val limit = parsed.coerceAtLeast(1.0)
+                    val safeName = planName.ifBlank { "Airtel Broadband" }
+                    onSave(safeName, limit)
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = AirtelRed)
             ) {

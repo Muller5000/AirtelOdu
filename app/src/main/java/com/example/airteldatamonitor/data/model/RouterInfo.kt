@@ -6,7 +6,9 @@ data class SignalMetrics(
     val rsrqDb: Int, // e.g. -9 dB
     val sinrDb: Double, // e.g. 18.5 dB
     val cellId: String = "404-45-72891",
-    val qualityLabel: String = "Good"
+    val qualityLabel: String = "Good",
+    val pci: String = "404",
+    val frequencyMhz: String = "1800 / 2600 MHz"
 )
 
 data class RouterInfo(

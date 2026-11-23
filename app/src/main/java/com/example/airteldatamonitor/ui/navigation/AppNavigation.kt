@@ -42,6 +42,8 @@ import com.example.airteldatamonitor.data.repository.RouterRepository
 import com.example.airteldatamonitor.theme.AirtelRed
 import com.example.airteldatamonitor.theme.AirtelRedMuted
 import com.example.airteldatamonitor.ui.common.tactileClickable
+import com.example.airteldatamonitor.ui.screens.AntennaAlignmentScreen
+import com.example.airteldatamonitor.ui.screens.AntennaAlignmentViewModel
 import com.example.airteldatamonitor.ui.screens.BandLockScreen
 import com.example.airteldatamonitor.ui.screens.BandLockViewModel
 import com.example.airteldatamonitor.ui.screens.DevicesScreen
@@ -72,6 +74,7 @@ fun MainAppScreen(
     var currentDestination by remember { mutableStateOf(AppDestination.HOME) }
     var isBandLockVisible by remember { mutableStateOf(false) }
     var isSmsCenterVisible by remember { mutableStateOf(false) }
+    var isAntennaAlignmentVisible by remember { mutableStateOf(false) }
 
     val homeViewModel = remember(repository) { HomeViewModel(repository) }
     val speedTestViewModel = remember(repository) { SpeedTestViewModel(repository) }
@@ -80,10 +83,24 @@ fun MainAppScreen(
     val settingsViewModel = remember(repository) { SettingsViewModel(repository) }
     val bandLockViewModel = remember(repository) { BandLockViewModel(repository) }
     val smsCenterViewModel = remember(repository) { SmsCenterViewModel(repository) }
+    val antennaAlignmentViewModel = remember(repository) { AntennaAlignmentViewModel(repository) }
 
     val bgColor = MaterialTheme.colorScheme.background
 
-    if (isSmsCenterVisible) {
+    if (isAntennaAlignmentVisible) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(bgColor)
+                .statusBarsPadding()
+                .navigationBarsPadding()
+        ) {
+            AntennaAlignmentScreen(
+                viewModel = antennaAlignmentViewModel,
+                onNavigateBack = { isAntennaAlignmentVisible = false }
+            )
+        }
+    } else if (isSmsCenterVisible) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -135,7 +152,8 @@ fun MainAppScreen(
                         onNavigateToDevices = { currentDestination = AppDestination.DEVICES },
                         onNavigateToSpeedTest = { currentDestination = AppDestination.SPEED },
                         onNavigateToSmsCenter = { isSmsCenterVisible = true },
-                        onNavigateToBandLock = { isBandLockVisible = true }
+                        onNavigateToBandLock = { isBandLockVisible = true },
+                        onNavigateToAntennaAlignment = { isAntennaAlignmentVisible = true }
                     )
                     AppDestination.SPEED -> SpeedTestScreen(
                         viewModel = speedTestViewModel

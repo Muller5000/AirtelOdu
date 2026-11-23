@@ -18,8 +18,10 @@ import com.example.airteldatamonitor.ui.screens.UsageViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
@@ -353,6 +355,118 @@ class AirtelDataMonitorUnitTest {
         assertEquals("*310#", ussdSession.lastDialedCode)
         assertNotNull(ussdSession.latestResponse)
         assertTrue(ussdSession.latestResponse!!.contains("Balance"))
+    }
+
+    @Test
+    fun testDataUsage_zeroPlan_doesNotThrowOrReturnNaN() {
+        val zeroPlanUsage = com.example.airteldatamonitor.data.model.DataUsage(
+            totalPlanGb = 0.0,
+            usedGb = 10.0,
+            remainingGb = 0.0
+        )
+        assertFalse("usagePercentage must not be NaN", zeroPlanUsage.usagePercentage.isNaN())
+        assertEquals(0f, zeroPlanUsage.usagePercentage, 0.001f)
+        assertFalse("remainingPercentage must not be NaN", zeroPlanUsage.remainingPercentage.isNaN())
+        assertEquals(0f, zeroPlanUsage.remainingPercentage, 0.001f)
+    }
+
+    @Test
+    fun testDataUsage_usedExceedsTotal_capsAt100Percent() {
+        val overLimitUsage = com.example.airteldatamonitor.data.model.DataUsage(
+            totalPlanGb = 100.0,
+            usedGb = 150.0,
+            remainingGb = 0.0
+        )
+        assertEquals(100f, overLimitUsage.usagePercentage, 0.001f)
+        assertEquals(0f, overLimitUsage.remainingPercentage, 0.001f)
+    }
+
+    @Test
+    fun testDevicesViewModel_searchWithSpecialCharacters_doesNotCrash() = runTest {
+        val viewModel = DevicesViewModel(repository)
+        advanceUntilIdle()
+
+        val devices = DemoRouterApiClient.sampleDevices
+        viewModel.setSearchQuery(".*[([{\\^$|?+*")
+        val filtered = viewModel.filterDevices(devices)
+        assertTrue(filtered.isEmpty())
+
+        viewModel.setSearchQuery("Galaxy")
+        val phoneFiltered = viewModel.filterDevices(devices)
+        assertTrue(phoneFiltered.any { it.name.contains("Galaxy") })
+    }
+
+    @Test
+    fun testDeviceNickname_persistsAcrossRepositoryCalls() {
+        val testMac = "AA:BB:CC:DD:EE:01"
+        repository.setDeviceNickname(testMac, "Test Office Laptop")
+        assertEquals("Test Office Laptop", repository.getDeviceNickname(testMac))
+
+        // Blank nickname clears it
+        repository.setDeviceNickname(testMac, "")
+        assertNull(repository.getDeviceNickname(testMac))
+    }
+
+    @Test
+    fun testSmsCenter_emptyUssdDialing_doesNotTriggerNetwork() = runTest {
+        val viewModel = com.example.airteldatamonitor.ui.screens.SmsCenterViewModel(repository)
+        advanceUntilIdle()
+
+        viewModel.dialUssd("   ")
+        advanceUntilIdle()
+
+        assertEquals("", viewModel.ussdSession.value.lastDialedCode)
+        assertFalse(viewModel.ussdSession.value.isDialing)
+    }
+
+    @Test
+    fun testAntennaAlignmentViewModel_initialLoadAndPeaks() = runTest {
+        val viewModel = com.example.airteldatamonitor.ui.screens.AntennaAlignmentViewModel(repository)
+        assertFalse(viewModel.isAuditing.value)
+
+        viewModel.startPolling()
+        advanceTimeBy(400)
+        runCurrent()
+
+        assertTrue(viewModel.isAuditing.value)
+        val signal = viewModel.currentSignal.value
+        assertNotNull(signal)
+        assertTrue(signal.rsrpDbm in -140..-40)
+        assertTrue(signal.sinrDb in -15.0..40.0)
+        assertTrue(viewModel.primaryBand.value.isNotEmpty())
+        assertTrue(viewModel.peakRsrpDbm.value >= signal.rsrpDbm)
+        assertTrue(viewModel.peakSinrDb.value >= signal.sinrDb)
+        assertTrue(viewModel.historySamples.value.isNotEmpty())
+
+        // Reset peaks
+        viewModel.resetPeaks()
+        assertEquals(viewModel.currentSignal.value.rsrpDbm, viewModel.peakRsrpDbm.value)
+        assertEquals(viewModel.currentSignal.value.sinrDb, viewModel.peakSinrDb.value, 0.001)
+        assertTrue(viewModel.historySamples.value.isEmpty())
+
+        viewModel.stopPolling()
+    }
+
+    @Test
+    fun testAntennaAlignmentViewModel_toggleAuditingAndAudioTones() = runTest {
+        val viewModel = com.example.airteldatamonitor.ui.screens.AntennaAlignmentViewModel(repository)
+        assertFalse(viewModel.isAuditing.value)
+
+        // Start audit via toggle
+        viewModel.toggleAuditing()
+        runCurrent()
+        assertTrue(viewModel.isAuditing.value)
+
+        // Pause audit via toggle
+        viewModel.toggleAuditing()
+        assertFalse(viewModel.isAuditing.value)
+
+        // Audio Tone ladder mode
+        assertFalse(viewModel.isAudioToneEnabled.value)
+        viewModel.toggleAudioTone(true)
+        assertTrue(viewModel.isAudioToneEnabled.value)
+        viewModel.toggleAudioTone(false)
+        assertFalse(viewModel.isAudioToneEnabled.value)
     }
 }
 
