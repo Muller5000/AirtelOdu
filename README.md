@@ -1,15 +1,15 @@
-# Airtel ODU Monitor (ZLT W154R Plus) — v1.1.0
+# Airtel ODU Monitor (ZLT W154R Plus) — v1.1.1
 
-[![Download APK](https://img.shields.io/badge/Download-APK%20(v1.1.0)-E60000?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Muller5000/AirtelOdu/releases/download/v1.1.0/AirtelOdu-v1.1.0.apk)
+[![Download APK](https://img.shields.io/badge/Download-APK%20(v1.1.1)-E60000?style=for-the-badge&logo=android&logoColor=white)](https://github.com/Muller5000/AirtelOdu/releases/download/v1.1.1/AirtelOdu-v1.1.1.apk)
 [![Release](https://img.shields.io/github/v/release/Muller5000/AirtelOdu?style=for-the-badge&color=00E676)](https://github.com/Muller5000/AirtelOdu/releases/latest)
 
 A native Android mobile application built with **Kotlin** and **Jetpack Compose** to monitor and manage broadband data usage, connected clients, live telemetry, carrier frequency bands, outdoor antenna alignment, and SMS/USSD services for the **Airtel ZLT W154R Plus** outdoor/indoor LTE-A CPE router.
 
-> 📲 **Download & Install**: Tap the badge above or grab the latest **[AirtelOdu-v1.1.0.apk](https://github.com/Muller5000/AirtelOdu/releases/download/v1.1.0/AirtelOdu-v1.1.0.apk)** directly on your Android phone to install the app.
+> 📲 **Download & Install**: Tap the badge above or grab the latest **[AirtelOdu-v1.1.1.apk](https://github.com/Muller5000/AirtelOdu/releases/download/v1.1.1/AirtelOdu-v1.1.1.apk)** directly on your Android phone to install the app.
 
 ---
 
-## 🚀 Features (v1.1.0)
+## 🚀 Features (v1.1.1)
 
 ### 1. Glanceable Home Dashboard (`HomeScreen.kt`)
 - **Unified Hero Card**: Real-time remaining data volume in GB with tabular digits, billing cycle days left, animated gradient progress track, active LTE band, and live RSRP signal quality indicator (`• B7 • -81 dBm` — tap to open Antenna Alignment).
